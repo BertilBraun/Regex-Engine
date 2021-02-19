@@ -1,104 +1,16 @@
 """
-    Program that should implement the basics of Regular Expressions
-
-    To Implement are:
-     - Groups       '(.....)'
-     - Class        '[.....]'
-     - Range        '[a-z..]'
-     - Or           '...|...'
-     - Wildcard     '.......'
-     - Zero-Inf     '......*'
-     - One-Inf      '......+'
-     - Zero-One     '......?'
-     - Escaped      '\\d \\w'
-     - From Start   '^......'
-     - From End     '......$'
-
+    The regex Implementation
 """
 
-
-def get_alphabet() -> str:
-    return '()[]|.*+?\\'
-
-
-def is_star(char: chr) -> bool:
-    return char == '*'
-
-
-def is_question(char: chr) -> bool:
-    return char == '?'
-
-
-def is_plus(char: chr) -> bool:
-    return char == '+'
-
-
-def is_dot(char: chr) -> bool:
-    return char == '.'
-
-
-def is_start(char: chr) -> bool:
-    return char == '^'
-
-
-def is_end(char: chr) -> bool:
-    return char == '$'
-
-
-def is_operator(char: chr) -> bool:
-    return is_plus(char) or is_question(char) or is_star(char)
-
-
-def is_alternate_open(char: chr) -> bool:
-    return char == '('
-
-
-def is_alternate_close(char: chr) -> bool:
-    return char == ')'
-
-
-def is_set_open(char: chr) -> bool:
-    return char == '['
-
-
-def is_set_close(char: chr) -> bool:
-    return char == ']'
-
-
-def is_escape(char: chr) -> bool:
-    return char == '\\'
-
-
-def is_literal(char: chr) -> bool:
-    return char not in get_alphabet()
-
-
-def is_unit(term: str) -> bool:
-    return is_literal(term[0]) or is_dot(term[0]) or is_set(term) or is_escape_sequence(term)
-
-
-def is_set(term: str) -> bool:
-    return is_set_open(term[0]) and is_set_close(term[-1])
-
-
-def is_alternate(term: str) -> bool:
-    return is_alternate_open(term[0]) and is_alternate_close(term[-1])
-
-
-def is_escape_sequence(term: str) -> bool:
-    return is_escape(term[0])
+from settings import *
 
 
 def split_set(head: str) -> list:
-    if len(head) == 0:
-        return []
-
     tokens = list(head[1:-1])
     out_tokens = []
 
     i = 0
-    end = len(tokens) - 2
-    while i <= end:
+    while i <= len(tokens) - 2:
         if tokens[i + 1] == '-':
             for j in range(ord(tokens[i]), ord(tokens[i + 2]) + 1):
                 out_tokens.append(chr(j))
@@ -107,9 +19,7 @@ def split_set(head: str) -> list:
             out_tokens.append(tokens[i])
             i += 1
 
-    for j in range(1, len(tokens) - end):
-        out_tokens.append(tokens[-j])
-
+    out_tokens.append(tokens[-1])
     return out_tokens
 
 
@@ -159,7 +69,7 @@ def does_unit_match(expr: str, string: str) -> bool:
         elif head == '\\d':
             return string[0].isdigit()
         else:
-            return False
+            raise Exception(f"Invalid Escape Sequence! couldn't process '{head}'!")
     elif is_set(head):
         tokens = split_set(head)
         return string[0] in tokens
@@ -216,8 +126,7 @@ def match_expr(expr: str, string: str, match_length: int = 0) -> (bool, int):
     if len(expr) == 0:
         return True, match_length
     elif is_end(expr[0]):
-        string_is_empty = len(string) == 0
-        return string_is_empty, match_length if string_is_empty else 0
+        return not len(string), match_length if not len(string) else 0
     if len(string) == 0:
         return False, 0
 
@@ -250,7 +159,6 @@ def match(regex: str, string: str) -> (bool, str):
         max_match_pos = len(string)
 
     try:
-
         while match_pos < max_match_pos:
             match_pos += 1
             matched, match_length = match_expr(regex, string[match_pos:])
@@ -262,16 +170,3 @@ def match(regex: str, string: str) -> (bool, str):
         return False, ''
 
     return False, ''
-
-
-def main():
-    regex = '([a-zABC]| )+'
-    string = 'abz ABC'
-
-    does_match, match_string = match(regex, string)
-
-    print(match_string, '->', does_match)
-
-
-if __name__ == '__main__':
-    main()
