@@ -46,7 +46,7 @@ These visualizations demonstrate the engine's capability to not only match patte
 
 ## Usage
 
-## High-Level Interface
+### High-Level Interface
 
 ```python
 from src.regex import match
@@ -57,7 +57,7 @@ print(f"{match('a(b|c)*d', 'abccbde')=}")
 print("It works!")
 ```
 
-## Compiling Patterns for Efficiency
+### Compiling Patterns for Efficiency
 
 For repeated matching, compile the pattern once and reuse the DFA:
 
@@ -70,6 +70,12 @@ print(f"{compiled.match('abccbde')=}")
 ```
 
 This approach significantly speeds up matching, especially when the same pattern is used multiple times.
+
+### Just try it!
+
+```bash
+python -m src.regex
+```
 
 ## Conclusion
 
